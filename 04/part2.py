@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
     for i in range(2, len(lines), 6):
         board = []
         for line in lines[i:i+5]:
-            board.append(map(int, line.split()))
+            board.append(list(map(int, line.split())))
         
         boards.append(board)
     
