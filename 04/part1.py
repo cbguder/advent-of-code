@@ -6,18 +6,18 @@ def main():
 
     with open('input') as f:
         lines = [line.strip() for line in f]
-    
+
     draws = map(int, lines[0].split(','))
 
     boards = []
 
     for i in range(2, len(lines), 6):
         board = []
-        for line in lines[i:i+5]:
+        for line in lines[i:i + 5]:
             board.append(list(map(int, line.split())))
-        
+
         boards.append(board)
-    
+
     draws_so_far = set()
 
     for draw in draws:
@@ -36,7 +36,7 @@ def board_wins(board, draws):
 
         if set(row).issubset(draws):
             return True
-        
+
         if set(column).issubset(draws):
             return True
 

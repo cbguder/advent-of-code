@@ -27,7 +27,7 @@ def main():
         else:
             gamma += '1'
             epsilon += '0'
-    
+
     power = int(gamma, 2) * int(epsilon, 2)
     print(power)
 

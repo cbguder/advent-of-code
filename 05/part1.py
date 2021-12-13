@@ -12,7 +12,7 @@ def main():
             x1, y1 = map(int, pt1.split(','))
             x2, y2 = map(int, pt2.split(','))
             lines.append(((x1, y1), (x2, y2)))
-    
+
     common_points = set()
     for line1, line2 in combinations(lines, 2):
         common_points |= find_common_points(line1, line2)
@@ -36,13 +36,14 @@ def points_on_line(start, end):
     points = set()
 
     if min_x == max_x:
-        for y in range(min_y, max_y+1):
+        for y in range(min_y, max_y + 1):
             points.add((min_x, y))
     elif min_y == max_y:
-        for x in range(min_x, max_x+1):
+        for x in range(min_x, max_x + 1):
             points.add((x, min_y))
 
     return points
+
 
 if __name__ == '__main__':
     main()

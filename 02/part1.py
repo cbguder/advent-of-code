@@ -8,7 +8,7 @@ def main():
         for line in f:
             parts = line.split()
             n = int(parts[1])
-            
+
             if parts[0] == 'forward':
                 pos += n
             elif parts[0] == 'down':
@@ -17,6 +17,7 @@ def main():
                 depth -= n
 
     print(pos * depth)
+
 
 if __name__ == '__main__':
     main()

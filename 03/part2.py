@@ -13,10 +13,10 @@ def main():
     for i in range(len(numbers[0])):
         oxygen = filter_bits(oxygen, i, '1')
         co2 = filter_bits(co2, i, '0')
-    
+
     assert len(oxygen) == 1
     assert len(co2) == 1
-    
+
     oxygen = int(oxygen[0], 2)
     co2 = int(co2[0], 2)
 
@@ -29,7 +29,7 @@ def count_bits(numbers, pos):
     for number in numbers:
         bit = number[pos]
         counts[bit] += 1
-    
+
     return counts
 
 

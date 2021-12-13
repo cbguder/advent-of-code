@@ -10,11 +10,11 @@ def main():
     positions = list(map(int, lines[0].split(',')))
 
     med = statistics.median(positions)
-    
+
     fuel = 0
     for pos in positions:
         fuel += int(abs(pos - med))
-    
+
     print(fuel)
 
 

@@ -3,15 +3,16 @@
 
 from collections import defaultdict
 
+
 def main():
     fish = defaultdict(int)
 
     with open('input') as f:
         lines = f.readlines()
-    
+
     for f in map(int, lines[0].split(',')):
         fish[f] += 1
-    
+
     for i in range(256):
         newfish = defaultdict(int)
 
@@ -20,10 +21,10 @@ def main():
                 newfish[6] += v
                 newfish[8] += v
             else:
-                newfish[k-1] += v
-        
+                newfish[k - 1] += v
+
         fish = newfish
-    
+
     print(sum(fish.values()))
 
 

@@ -44,7 +44,7 @@ def decode(signals, digits):
     mapping['a'] = mapping['acf'] - mapping['cf']
     mapping['eg'] = mapping['abcdefg'] - (mapping['bcdf'] | mapping['a'])
     mapping['bcef'] = (signals_by_length[5][0] | signals_by_length[5][1] | signals_by_length[5][2]) - (
-                signals_by_length[5][0] & signals_by_length[5][1] & signals_by_length[5][2])
+            signals_by_length[5][0] & signals_by_length[5][1] & signals_by_length[5][2])
     mapping['abfg'] = (signals_by_length[6][0] & signals_by_length[6][1] & signals_by_length[6][2])
     mapping['d'] = mapping['bcdf'] - mapping['bcef']
     mapping['e'] = mapping['bcef'] - mapping['bcdf']

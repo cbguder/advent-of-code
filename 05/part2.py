@@ -10,7 +10,7 @@ def main():
             x1, y1 = map(int, pt1.split(','))
             x2, y2 = map(int, pt2.split(','))
             lines.append(((x1, y1), (x2, y2)))
-    
+
     point_counts = {}
     for line in lines:
         for point in points_on_line(line[0], line[1]):
@@ -35,7 +35,7 @@ def points_on_line(start, end):
     for i in range(num_points):
         x = start[0] + (x_step * i)
         y = start[1] + (y_step * i)
-        yield((x, y))
+        yield x, y
 
 
 if __name__ == '__main__':
