@@ -1,85 +1,103 @@
 #!/usr/bin/env python3
 
+import re
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int
+
+
+@dataclass(frozen=True)
+class Velocity:
+    x: int
+    y: int
+
+
+@dataclass(frozen=True)
+class Area:
+    min: Point
+    max: Point
+
+    def contains(self, pt):
+        return (self.min.x <= pt.x <= self.max.x) and (self.min.y <= pt.y <= self.max.y)
+
+    def missed(self, pt):
+        return pt.x > self.max.x or pt.y < self.min.y
+
+    def height(self):
+        return int(abs(self.max.y - self.min.y))
+
 
 def main():
     with open("input") as f:
-        input = f.readline().strip()
+        input = f.readline()
 
-    xr, yr = input[13:].split(", ")
-    xmin, xmax = tuple(map(int, xr[2:].split("..")))
-    ymin, ymax = tuple(map(int, yr[2:].split("..")))
+    match = re.match(r"target area: x=(.+)\.\.(.+), y=(.+)\.\.(.+)", input)
+    xmin, xmax, ymin, ymax = tuple(map(int, match.group(1, 2, 3, 4)))
 
-    res = find_highest_y(xmin, xmax, ymin, ymax)
+    assert xmin > 0
+    assert xmax > 0
+    assert ymin < 0
+    assert ymax < 0
+    assert xmin < xmax
+    assert ymin < ymax
+
+    target = Area(Point(xmin, ymin), Point(xmax, ymax))
+
+    res = find_highest_y(target)
     print(res)
 
 
-def find_highest_y(xmin, xmax, ymin, ymax):
-    highest = None
+def find_highest_y(area):
+    vx_max = area.max.x
+    vy_max = int(abs(area.min.y))
 
-    vx = 1
-    while True:
-        highest_with_vx = find_highest_y_with_vx(vx, xmin, xmax, ymin, ymax)
-        if highest_with_vx is None:
-            if highest is not None:
-                break
-        elif highest is None or highest_with_vx > highest:
-            highest = highest_with_vx
-        vx += 1
+    highest_overall = 0
 
-    return highest
+    for vx in range(vx_max + 1):
+        for vy in range(vy_max + 1):
+            v = Velocity(vx, vy)
+            highest_y = find_highest_y_with_velocity(v, area)
+            if highest_y is not None and highest_y > highest_overall:
+                highest_overall = highest_y
 
-
-def find_highest_y_with_vx(vx, xmin, xmax, ymin, ymax):
-    highest = None
-
-    vy = 0
-    nones = 0
-    while True:
-        highest_with_v = find_highest_y_with_velocity(vx, vy, xmin, xmax, ymin, ymax)
-
-        if highest_with_v is not None:
-            if highest is None or highest_with_v > highest:
-                highest = highest_with_v
-        else:
-            nones += 1
-            if nones > 15:
-                break
-
-        vy += 1
-
-    return highest
+    return highest_overall
 
 
-def find_highest_y_with_velocity(vx, vy, xmin, xmax, ymin, ymax):
+def find_highest_y_with_velocity(v, area):
+    pt = Point(0, 0)
     highest = 0
 
-    x, y = 0, 0
     while True:
-        x, y, vx, vy = step(x, y, vx, vy)
-        if y > highest:
-            highest = y
+        pt, v = step(pt, v)
+        if pt.y > highest:
+            highest = pt.y
 
-        if xmin <= x <= xmax and ymin <= y <= ymax:
+        if area.contains(pt):
             break
 
-        if x > xmax or y < ymin:
+        if area.missed(pt):
             return None
 
     return highest
 
 
-def step(x, y, vx, vy):
-    x += vx
-    y += vy
+def step(pt, v):
+    x = pt.x + v.x
+    y = pt.y + v.y
 
+    vx = v.x
     if vx > 0:
         vx -= 1
     elif vx < 0:
         vx += 1
 
-    vy -= 1
+    vy = v.y - 1
 
-    return x, y, vx, vy
+    return Point(x, y), Velocity(vx, vy)
 
 
 if __name__ == '__main__':

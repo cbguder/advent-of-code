@@ -1,78 +1,101 @@
 #!/usr/bin/env python3
 
+import re
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Point:
+    x: int
+    y: int
+
+
+@dataclass(frozen=True)
+class Velocity:
+    x: int
+    y: int
+
+
+@dataclass(frozen=True)
+class Area:
+    min: Point
+    max: Point
+
+    def contains(self, pt):
+        return (self.min.x <= pt.x <= self.max.x) and (self.min.y <= pt.y <= self.max.y)
+
+    def missed(self, pt):
+        return pt.x > self.max.x or pt.y < self.min.y
+
+    def height(self):
+        return int(abs(self.max.y - self.min.y))
+
 
 def main():
     with open("input") as f:
-        input = f.readline().strip()
+        input = f.readline()
 
-    xr, yr = input[13:].split(", ")
-    xmin, xmax = tuple(map(int, xr[2:].split("..")))
-    ymin, ymax = tuple(map(int, yr[2:].split("..")))
+    match = re.match(r"target area: x=(.+)\.\.(.+), y=(.+)\.\.(.+)", input)
+    xmin, xmax, ymin, ymax = tuple(map(int, match.group(1, 2, 3, 4)))
 
-    vels = find_valid_velocities(xmin, xmax, ymin, ymax)
-    print(len(vels))
+    assert xmin > 0
+    assert xmax > 0
+    assert ymin < 0
+    assert ymax < 0
+    assert xmin < xmax
+    assert ymin < ymax
 
+    target = Area(Point(xmin, ymin), Point(xmax, ymax))
 
-def find_valid_velocities(xmin, xmax, ymin, ymax):
-    valid_velocities = set()
-
-    vx = 1
-    while True:
-        velocities = find_valid_velocities_with_vx(vx, xmin, xmax, ymin, ymax)
-        valid_velocities.update(velocities)
-        vx += 1
-
-        if vx > xmax:
-            break
-
-    return valid_velocities
+    res = find_valid_velocities(target)
+    print(res)
 
 
-def find_valid_velocities_with_vx(vx, xmin, xmax, ymin, ymax):
-    valid_velocities = set()
-    misses = 0
+def find_valid_velocities(area):
+    vx_max = area.max.x
+    vy_min = area.min.y
+    vy_max = int(abs(area.min.y))
 
-    vy = ymin
-    while True:
-        if lands_in_target(vx, vy, xmin, xmax, ymin, ymax):
-            valid_velocities.add((vx, vy))
-        else:
-            misses += 1
-            if misses > 200:
-                break
+    valid_velocities = 0
 
-        vy += 1
+    for vx in range(vx_max + 1):
+        for vy in range(vy_min, vy_max + 1):
+            v = Velocity(vx, vy)
+            if is_valid_velocity(v, area):
+                valid_velocities += 1
 
     return valid_velocities
 
 
-def lands_in_target(vx, vy, xmin, xmax, ymin, ymax):
-    x, y = 0, 0
-    while True:
-        x, y, vx, vy = step(x, y, vx, vy)
+def is_valid_velocity(v, area):
+    pt = Point(0, 0)
+    highest = 0
 
-        if xmin <= x <= xmax and ymin <= y <= ymax:
+    while True:
+        pt, v = step(pt, v)
+        if pt.y > highest:
+            highest = pt.y
+
+        if area.contains(pt):
             return True
 
-        if vx == 0 and x < xmin:
-            return False
-
-        if x > xmax or y < ymin:
+        if area.missed(pt):
             return False
 
 
-def step(x, y, vx, vy):
-    x += vx
-    y += vy
+def step(pt, v):
+    x = pt.x + v.x
+    y = pt.y + v.y
 
+    vx = v.x
     if vx > 0:
         vx -= 1
     elif vx < 0:
         vx += 1
 
-    vy -= 1
+    vy = v.y - 1
 
-    return x, y, vx, vy
+    return Point(x, y), Velocity(vx, vy)
 
 
 if __name__ == '__main__':
