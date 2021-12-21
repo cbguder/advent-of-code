@@ -2,48 +2,20 @@
 
 from __future__ import annotations
 
-import queue
 import re
-import threading
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Tuple, Optional
 
 ROLL_DIST = {3: 1, 4: 3, 5: 6, 6: 7, 7: 6, 8: 3, 9: 1}
 
 
 @dataclass(frozen=True)
-class Node:
-    depth: int
-    pos: List[int]
-    scores: List[int]
-    weight: int
-    winner: Optional[int] = None
-
-
-class Worker(threading.Thread):
-    def __init__(self, q, win_counts, win_counts_lock):
-        super().__init__()
-        self.q = q
-        self.win_counts = win_counts
-        self.win_counts_lock = win_counts_lock
-
-    def run(self):
-        while True:
-            try:
-                node = self.q.get(timeout=3)
-            except queue.Empty:
-                return
-
-            for roll_sum, weight in ROLL_DIST.items():
-                nn = next_node(node, roll_sum, weight)
-                if nn.winner is None:
-                    self.q.put(nn)
-                else:
-                    with self.win_counts_lock:
-                        self.win_counts[nn.winner] += nn.weight
-
-            self.q.task_done()
+class State:
+    next_player: int
+    pos: Tuple[int, int]
+    score: Tuple[int, int]
+    winner: Optional[int]
 
 
 def main():
@@ -56,31 +28,49 @@ def main():
             m = exp.match(line)
             pos.append(int(m[1]))
 
-    root = Node(
-        depth=0,
-        scores=[0, 0],
-        pos=pos,
-        weight=1,
+    start = State(
+        next_player=0,
+        pos=(pos[0], pos[1]),
+        score=(0, 0),
+        winner=None,
     )
 
+    states = defaultdict(int)
+    states[start] = 1
+    prevs = defaultdict(set)
+
+    stack = {start}
+    while True:
+        next_stack = set()
+
+        for prev in stack:
+            for roll_sum, weight in ROLL_DIST.items():
+                next = next_state(prev, roll_sum)
+                prevs[next].add((prev, weight))
+
+                if next.winner is None:
+                    next_stack.add(next)
+
+                states[next] = sum(states[p] * w for p, w in prevs[next])
+
+        if not next_stack:
+            break
+
+        stack = next_stack
+
     win_counts = defaultdict(int)
-    lock = threading.Lock()
-
-    q = queue.Queue()
-    q.put(root)
-    for _ in range(8):
-        Worker(q, win_counts, lock).start()
-
-    q.join()
+    for state, count in states.items():
+        if state.winner is not None:
+            win_counts[state.winner] += count
 
     print(max(win_counts.values()))
 
 
-def next_node(node, roll_sum, weight):
-    pos = node.pos[:]
-    score = node.scores[:]
+def next_state(prev, roll_sum):
+    pos = list(prev.pos)
+    score = list(prev.score)
 
-    idx = node.depth % 2
+    idx = prev.next_player
     pos[idx] += roll_sum
     while pos[idx] > 10:
         pos[idx] -= 10
@@ -91,12 +81,13 @@ def next_node(node, roll_sum, weight):
     if score[idx] >= 21:
         winner = idx
 
-    return Node(
-        depth=node.depth + 1,
-        pos=pos,
-        scores=score,
-        winner=winner,
-        weight=node.weight * weight,
+    next_player = (idx + 1) % 2
+
+    return State(
+        next_player=next_player,
+        pos=(pos[0], pos[1]),
+        score=(score[0], score[1]),
+        winner=winner
     )
 
 
