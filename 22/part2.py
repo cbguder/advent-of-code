@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import re
 from dataclasses import dataclass
 
@@ -35,6 +36,23 @@ class Range:
                 and
                 (self.start <= other.end <= self.end)
         )
+
+    def quadrant(self):
+        if self.start >= 0:
+            assert self.end >= 0
+            return 1
+
+        assert self.end < 0
+        return 0
+
+    def split_to_quadrants(self):
+        if self.start < 0 <= self.end:
+            return [
+                Range(self.start, -1),
+                Range(0, self.end),
+            ]
+
+        return [self]
 
     def __lt__(self, other):
         return self.end < other.start
@@ -104,6 +122,26 @@ class Cube:
 
         return to_add, rest
 
+    def split_to_quadrants(self):
+        xranges = self.xrange.split_to_quadrants()
+        yranges = self.yrange.split_to_quadrants()
+        zranges = self.zrange.split_to_quadrants()
+
+        cubelets = []
+
+        for xrange in xranges:
+            for yrange in yranges:
+                for zrange in zranges:
+                    cubelets.append(Cube(xrange, yrange, zrange))
+
+        return cubelets
+
+    def quadrant(self):
+        xq = self.xrange.quadrant()
+        yq = self.yrange.quadrant()
+        zq = self.zrange.quadrant()
+        return xq * 4 + yq * 2 + zq
+
     def _split(self, other):
         for xrange in self.xrange.split(other.xrange):
             for yrange in self.yrange.split(other.yrange):
@@ -114,7 +152,9 @@ class Cube:
 def main():
     exp = re.compile(r"(\w+) x=(-?\d+)..(-?\d+),y=(-?\d+)..(-?\d+),z=(-?\d+)..(-?\d+)")
 
-    on_cubes = []
+    quadrants = []
+    for _ in range(8):
+        quadrants.append([])
 
     with open('input') as f:
         for line in f:
@@ -126,9 +166,12 @@ def main():
             zrange = Range(int(m[6]), int(m[7]))
 
             cube = Cube(xrange, yrange, zrange)
-            on_cubes = insert(on_cubes, cube, is_on)
+            cubelets = cube.split_to_quadrants()
+            for cubelet in cubelets:
+                q = cubelet.quadrant()
+                quadrants[q] = insert(quadrants[q], cubelet, is_on)
 
-    on_points = sum(c.num_points() for c in on_cubes)
+    on_points = sum(sum(c.num_points() for c in q) for q in quadrants)
     print(on_points)
 
 
