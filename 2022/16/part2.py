@@ -91,6 +91,7 @@ def main():
             nodes[valve] = node
 
     find_flow("AA", "AA", 26, 0, opens)
+    print(best)
 
 
 if __name__ == "__main__":
