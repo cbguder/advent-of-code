@@ -1,0 +1,3 @@
+pyperclip
+pypng
+z3-solver
