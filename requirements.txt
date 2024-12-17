@@ -1,3 +1,4 @@
+black
 networkx
 pyperclip
 pypng
