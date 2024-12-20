@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Generator, Optional, TypeVar
+from typing import Generator, Optional, Tuple, TypeVar
 
 from lib.point import Point
 from lib.region import Region
@@ -47,6 +47,11 @@ class Grid[T]:
             if self.in_bounds(n):
                 ret.append(n)
         return ret
+
+    def items(self) -> Generator[Tuple[Point, T]]:
+        for y, row in enumerate(self.rows):
+            for x, val in enumerate(row):
+                yield Point(x, y), val
 
     def flood(self, start: Point) -> Region:
         value = self.at(start)

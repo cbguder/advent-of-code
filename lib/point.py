@@ -15,3 +15,6 @@ class Point:
 
     def __mul__(self, fac: int) -> Point:
         return Point(self.x * fac, self.y * fac)
+
+    def __abs__(self):
+        return Point(abs(self.x), abs(self.y))
