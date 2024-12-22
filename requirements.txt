@@ -2,5 +2,6 @@ black
 networkx
 pyperclip
 pypng
+pytest
 tqdm
 z3-solver
