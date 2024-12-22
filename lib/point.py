@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 
 
@@ -16,5 +17,5 @@ class Point:
     def __mul__(self, fac: int) -> Point:
         return Point(self.x * fac, self.y * fac)
 
-    def __abs__(self):
+    def __abs__(self) -> Point:
         return Point(abs(self.x), abs(self.y))

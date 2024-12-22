@@ -4,7 +4,7 @@ from typing import Generator, Optional, Tuple, TypeVar
 from lib.point import Point
 from lib.region import Region
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 @dataclass
