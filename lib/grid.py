@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
-from typing import Generator, Optional, Tuple, TypeVar
+from dataclasses import dataclass
+from typing import Generator, Optional, Sequence, Tuple, TypeVar
 
 from lib.point import Point
 from lib.region import Region
@@ -9,7 +9,7 @@ T = TypeVar("T")
 
 @dataclass
 class Grid[T]:
-    rows: list[list[T]] = field(default_factory=list)
+    rows: Sequence[Sequence[T]]
 
     @property
     def width(self) -> int:
