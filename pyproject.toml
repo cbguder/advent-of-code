@@ -1,0 +1,16 @@
+[project]
+name = "advent-of-code"
+version = "0.1.0"
+description = "Advent of Code solutions"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "black>=25.1.0",
+    "isort>=6.0.0",
+    "networkx>=3.4.2",
+    "pyperclip>=1.9.0",
+    "pypng>=0.20220715.0",
+    "pytest>=8.3.4",
+    "tqdm>=4.67.1",
+    "z3-solver>=4.14.0.0",
+]
