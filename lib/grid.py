@@ -40,9 +40,14 @@ class Grid[T]:
     def column(self, x: int) -> list[T]:
         return [r[x] for r in self.rows]
 
-    def neighbors(self, p: Point) -> list[Point]:
+    def neighbors(self, p: Point, include_diagonal=False) -> list[Point]:
+        if include_diagonal:
+            deltas = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+        else:
+            deltas = [(-1, 0), (0, -1), (0, 1), (1, 0)]
+
         ret = []
-        for dy, dx in [(1, 0), (-1, 0), (0, 1), (0, -1)]:
+        for dy, dx in deltas:
             n = Point(p.x + dx, p.y + dy)
             if self.in_bounds(n):
                 ret.append(n)
@@ -53,7 +58,7 @@ class Grid[T]:
             for x, val in enumerate(row):
                 yield Point(x, y), val
 
-    def flood(self, start: Point) -> Region:
+    def flood(self, start: Point, diagonal=False) -> Region:
         value = self.at(start)
         queue = [start]
         points: set[Point] = set()
@@ -68,7 +73,7 @@ class Grid[T]:
 
             points.add(p)
 
-            for np in self.neighbors(p):
+            for np in self.neighbors(p, include_diagonal=diagonal):
                 if np not in seen:
                     queue.append(np)
 
