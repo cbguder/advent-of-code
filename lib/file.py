@@ -1,7 +1,7 @@
 from typing import Optional, TextIO
 
 from lib.grid import Grid
-from lib.point import Point
+from lib.point import Point, Point3D
 
 
 class File:
@@ -15,6 +15,9 @@ class File:
 
     def read_points(self) -> list[Point]:
         return [Point(*map(int, pts)) for pts in self.read_multi_lines(",")]
+
+    def read_points_3d(self) -> list[Point3D]:
+        return [Point3D(*map(int, pts)) for pts in self.read_multi_lines(",")]
 
     def read_lines(self) -> list[str]:
         lines = []
