@@ -31,14 +31,14 @@ def main():
         area = (d.x + 1) * (d.y + 1)
 
         if area > ret:
-            if foo(a, b):
+            if valid_rect(a, b):
                 ret = area
 
     print(ret)
     pyperclip.copy(ret)
 
 
-def foo(a, b):
+def valid_rect(a, b):
     xmin, xmax = min(a.x, b.x), max(a.x, b.x)
     ymin, ymax = min(a.y, b.y), max(a.y, b.y)
 
